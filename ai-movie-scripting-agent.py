@@ -91,3 +91,9 @@ if anthropic_api_key and serp_api_key:
             # get response from agent
             response: RunOutput = movie_producers.run(input_text, stream=False)
             st.write(response.content)
+
+    st.info(
+        "⚠️ Usage limits for this app ⚠️  \n"
+        "Requests Per Minute : 10 requests  \n"
+        "Requests Per Day : 250 requests"
+    )
