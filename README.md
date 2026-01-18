@@ -2,7 +2,7 @@
 
 **Turn your movie ideas into full script outlines and casting suggestions instantly!**
 
-This application uses a multi-agent AI team to act as your personal **Script Writer** and **Casting Director**. Powered by **Anthropic Claude 3.5 Sonnet** and **SerpApi**, it generates creative plotlines and finds real-world actors suitable for the roles.
+This application uses a multi-agent AI team to act as your personal **Script Writer** and **Casting Director**. Powered by **Gemini 2.5 Flash** and **SerpApi**, it generates creative plotlines and finds real-world actors suitable for the roles.
 
 ---
 
@@ -18,7 +18,7 @@ This application uses a multi-agent AI team to act as your personal **Script Wri
 - **Python** 🐍
 - **Streamlit** (User Interface) 👆
 - **Agno** (Agentic Framework) 🧠
-- **Anthropic Claude 3.5 Sonnet** (LLM) 🤖
+- **Gemini 2.5 Flash** (LLM) 🤖
 - **SerpApi** (Real-time Google Search) 🔍
 
 ## 📋 Prerequisites
@@ -26,7 +26,7 @@ This application uses a multi-agent AI team to act as your personal **Script Wri
 Before you begin, ensure you have the following:
 
 - **Python 3.9+** installed.
-- An **[Anthropic API Key](https://console.anthropic.com/)**.
+- An **[Google API Key](https://aistudio.google.com/)**.
 - A **[SerpApi Key](https://serpapi.com/)** (for Google Search capabilities).
 
 ## ⚙️ Installation & Setup
@@ -56,7 +56,7 @@ Before you begin, ensure you have the following:
 4. **Configure Environment Variables**
    Create a `.env` file in the root directory and add your keys:
    ```env
-   ANTHROPIC_API_KEY=your-api-key
+   GOOGLE_API_KEY=your-api-key
    SERP_API_KEY=your-api-key
    ```
 
