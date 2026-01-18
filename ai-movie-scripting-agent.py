@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 import streamlit as st
 from agno.agent import Agent
-from agno.models.anthropic import claude
+from agno.models.google import Gemini
 from agno.run.agent import RunOutput
 from agno.team import Team
 from agno.tools.serpapi import SerpApiTools
@@ -15,14 +15,13 @@ st.caption("Punch in your plot idea, I'll generate full movie script for you...�
 
 # set up API keys
 load_dotenv()
-anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+anthropic_api_key = os.getenv("GOOGLE_API_KEY")
 serp_api_key = os.getenv("SERP_API_KEY")
-print(anthropic_api_key)
 
 if anthropic_api_key and serp_api_key:
     script_writer = Agent(
         name="ScriptWriter",
-        model=claude.Claude(id="claude-3.5-sonnet", api_key=anthropic_api_key),
+        model=Gemini(id="gemini-2.5-flash", api_key=anthropic_api_key),
         description=dedent(
             """\
         You are an expert screenplay writer. Given a movie idea and genre, 
@@ -38,7 +37,7 @@ if anthropic_api_key and serp_api_key:
 
     casting_director = Agent(
         name="CastingDirector",
-        model=claude.Claude(id="claude-3.5-sonnet", api_key=anthropic_api_key),
+        model=Gemini(id="gemini-2.5-flash", api_key=anthropic_api_key),
         description=dedent(
             """\
         You are a talented casting director. Given a script outline and character descriptions,
@@ -56,7 +55,7 @@ if anthropic_api_key and serp_api_key:
 
     movie_producers = Team(
         name="MovieProducers",
-        model=claude.Claude(id="claude-3.5-sonnet", api_key=anthropic_api_key),
+        model=Gemini(id="gemini-2.5-flash", api_key=anthropic_api_key),
         members=[script_writer, casting_director],
         description="Experienced movie producer overseeing script and casting.",
         instructions=[
@@ -69,7 +68,7 @@ if anthropic_api_key and serp_api_key:
     )
 
     # input fields
-    movie_idea = st.text_area("Describe what's cooking in your mind...💡 few sentences will do!")
+    movie_idea = st.text_area("Describe what's cooking in your mind...💡 Few sentences will do!")
     genre = st.selectbox(
         "Choose the movie genre🎭",
         ["Action", "Comedy", "Horror", "Romance", "Sci-Fi", "Thriller", "Drama"]

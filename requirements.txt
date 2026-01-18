@@ -3,3 +3,4 @@ agno>=2.2.10
 google-search-results
 lxml_html_clean
 python-dotenv
+google-genai
