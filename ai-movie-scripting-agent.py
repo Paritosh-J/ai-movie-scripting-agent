@@ -1,5 +1,6 @@
 # import required libs
 import os
+import json
 from dotenv import load_dotenv
 import streamlit as st
 from agno.agent import Agent
@@ -10,7 +11,7 @@ from agno.tools.serpapi import SerpApiTools
 from textwrap import dedent
 
 # set up streamlit app
-st.title("AI Movie Scripting Agent 🎬🤖✨")
+st.title("🤖 AI Movie Scripting Agent 🎬✨")
 st.caption("Punch in your plot idea, I'll generate full movie script for you...🔥")
 
 # set up API keys
@@ -82,15 +83,65 @@ if anthropic_api_key and serp_api_key:
     # agent starts to work
     if st.button("Generate Script📝"):
         with st.spinner("Scripting your cool idea...✍️"):
-            input_text = (
-                f"Movie idea: {movie_idea}\n"
-                f"Genre: {genre}\n"
-                f"Target audience: {target_audience}\n"
-                f"Movie runtime: {movie_runtime} mins\n"
-            )
-            # get response from agent
-            response: RunOutput = movie_producers.run(input_text, stream=False)
-            st.write(response.content)
+            try:
+                input_text = (
+                    f"Movie idea: {movie_idea}\n"
+                    f"Genre: {genre}\n"
+                    f"Target audience: {target_audience}\n"
+                    f"Movie runtime: {movie_runtime} mins\n"
+                )
+                # get response from agent
+                response: RunOutput = movie_producers.run(input_text, stream=False)
+
+                # Normalize content
+                content = getattr(response, "content", "")
+                parsed = None
+                try:
+                    parsed = json.loads(content) if isinstance(content, str) else None
+                except Exception:
+                    parsed = None
+
+                # If the agent returned a JSON with an "error" key, hide it by default
+                if isinstance(parsed, dict) and "error" in parsed:
+                    st.error(
+                        "🥵 Looks like I'm overloaded — please try again later. 🥲")
+                    # Show details only if developer mode enabled or user explicitly asks
+                    dev_mode = os.getenv("DEV_MODE", "false").lower() == "true"
+                    if dev_mode:
+                        with st.expander("🔧 Technical details (DEV MODE)"):
+                            st.code(json.dumps(parsed, indent=2), language="json")
+                    else:
+                        if st.checkbox("Show technical details"):
+                            st.code(json.dumps(parsed, indent=2), language="json")
+                else:
+                    # Safe to show normal content
+                    st.write(content)
+
+            except Exception as e:
+                # Best-effort: try to parse exception text as JSON (some libs return JSON text in the exception)
+                raw_error = str(e)
+                pretty = raw_error
+                try:
+                    parsed_exc = json.loads(raw_error)
+                    pretty = json.dumps(parsed_exc, indent=2)
+                except Exception:
+                    parsed_exc = None
+
+                # If it's a Gemini-style JSON error, don't dump it on UI by default
+                if isinstance(parsed_exc, dict) and "error" in parsed_exc:
+                    st.error(
+                        "🥵 Looks like I'm overloaded — please try again later. 🥲")
+                    dev_mode = os.getenv("DEV_MODE", "false").lower() == "true"
+                    if dev_mode:
+                        with st.expander("🔧 Technical details (DEV MODE)"):
+                            st.code(pretty, language="json")
+                    else:
+                        if st.checkbox("Show technical details (error encountered)"):
+                            st.code(pretty, language="json")
+                else:
+                    st.error("😵 An unexpected error occurred.")
+                    with st.expander("Technical details"):
+                        st.code(pretty)
 
     st.info(
         "⚠️ Usage limits for this app ⚠️  \n"
